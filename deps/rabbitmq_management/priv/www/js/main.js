@@ -1,5 +1,6 @@
+/* MR
 $(document).ready(function() {
-    if (oauth.readiness_url) {
+    if (oauth.enable && !oauth.logged_in && oauth.readiness_url) {
         get(oauth['readiness_url'], "application/json", function(req) {
             if (req.status !== 200) {
                 replace_content('outer', format('login_uaa', {}));
@@ -13,6 +14,7 @@ $(document).ready(function() {
         start_app_login();
     }
 });
+*/
 
 function dispatcher_add(fun) {
     dispatcher_modules.push(fun);
@@ -63,10 +65,10 @@ function start_app_login() {
             check_login();
         });
     });
-    if (oauth['enable']) {
+    if (oauth.enable) {
         var token = getAccessToken();
         if (token != null) {
-            set_auth_pref(uaa_client_id + ':' + token);
+            //set_auth_pref(uaa_client_id + ':' + token);
             store_pref('uaa_token', token);
             check_login();
         } else if(has_auth_cookie_value()) {

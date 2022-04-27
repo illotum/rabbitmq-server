@@ -3,26 +3,57 @@
 // import {axios} from "./scripts/axios/axios.min.js"
 
 
-var settings = {
-  response_type: "code",
-
-  filterProtocolClaims: true,
-  revokeAccessTokenOnSignout: true,
-};
 var mgr;
 
-function initOidcClient(externalSettings, rabbit_base_uri) {
-  externalSettings.redirect_uri = rabbit_base_uri + "/js/oidc-oauth/login-callback.html",
-  externalSettings.post_logout_redirect_uri = rabbit_base_uri + "/js/oidc-oauth/logout-callback.html",
+function initializeOAuthIfRequired() {
+    rabbit_port = window.location.port ? ":" +  window.location.port : ""
+    rabbit_base_uri = window.location.protocol + "//" + window.location.hostname + rabbit_port
 
-  Object.assign(settings, externalSettings);
-
-  mgr = new oidc.UserManager(settings);
-
-  oidc.Log.setLogger(console);
-  oidc.Log.setLevel(oidc.Log.INFO);
+    var request = new XMLHttpRequest();
+    request.open('GET', rabbit_base_uri + '/api/auth', false);
+    request.send(null);
+    if (request.status === 200) {
+        return initializeOAuth(JSON.parse(request.responseText));
+    }else {
+        return { "enable" : false };
+    }
 
 }
+
+function initializeOAuth(authSettings) {
+    oauth = {
+      "logged_in": false,
+      "enable" : authSettings.oauth_enable,
+      "client_id" : authSettings.oauth_client_id,
+      "url" : authSettings.oauth_url,
+      "readiness_url" : authSettings.oauth_url + "/.well-known/openid-configuration"
+    }
+
+    if (!oauth.enable) return oauth;
+
+    oidcSettings = {
+        //userStore: new WebStorageStateStore({ store: window.localStorage }),
+        authority: authSettings.oauth_url,
+        client_id: authSettings.oauth_client_id,
+        client_secret: authSettings.oauth_client_secret,
+        response_type: "code",
+        scope: "openid profile rabbitmq.*",
+        resource: authSettings.oauth_resource_id,
+        redirect_uri: rabbit_base_uri + "/js/oidc-oauth/login-callback.html",
+        post_logout_redirect_uri: rabbit_base_uri + "/js/oidc-oauth/logout-callback.html",
+
+        response_type: "code",
+        filterProtocolClaims: true,
+        revokeAccessTokenOnSignout: true,
+    };
+
+    mgr = new oidc.UserManager(oidcSettings);
+    oidc.Log.setLogger(console);
+    oidc.Log.setLevel(oidc.Log.INFO);
+
+    return oauth;
+}
+
 function log() {
     message = ""
     Array.prototype.forEach.call(arguments, function(msg) {

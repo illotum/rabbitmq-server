@@ -23,40 +23,24 @@
     <link href="favicon.ico" rel="shortcut icon" type="image/x-icon"/>
 
     <script type="application/javascript">
-      var authSettings = JSON.parse(sync_get('/auth'));
-
-      var oauth = {
-        "logged_in": false,
-        "enable" : authSettings.oauth_enable,
-        "client_id" : authSettings.oauth_client_id,
-        "url" : authSettings.oauth_url,
-        "readiness_url" : authSettings.oauth_url + "/.well-known/openid-configuration"
-      }
+      var oauth = initializeOAuthIfRequired();
 
       if (oauth.enable) {
-        rabbit_port = window.location.port ? ":" +  window.location.port : ""
-        rabbit_base_uri = window.location.protocol + "//" + window.location.hostname + rabbit_port
-
-        oidcSettings = {
-            //userStore: new WebStorageStateStore({ store: window.localStorage }),
-            authority: authSettings.oauth_url,
-            client_id: authSettings.oauth_client_id,
-            client_secret: authSettings.oauth_client_secret,
-            response_type: "code",
-            scope: "openid profile rabbitmq.*",
-            resource: authSettings.oauth_resource_id
-        };
-        initOidcClient(oidcSettings, rabbit_base_uri);
-
         isLoggedIn().then( status => {
           if (!status.loggedIn) {
             replace_content('outer', format('login_uaa', {}));
           }  else {
+            oauth.logged_in = true
+            oauth.user_name = status.user.profile["user_name"]
+            oauth.scopes = status.user.scope          
             start_app_login();
           }
         });
-
+      }else {
+        replace_content('outer', format('login', {}));
+        start_app_login();
       }
+
     </script>
 
 <!--[if lte IE 8]>
