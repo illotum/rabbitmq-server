@@ -1,9 +1,9 @@
 $(document).ready(function() {
-    if (enable_uaa) {
-        get(uaa_location + "/info", "application/json", function(req) {
+    if (oauth.readiness_url) {
+        get(oauth['readiness_url'], "application/json", function(req) {
             if (req.status !== 200) {
                 replace_content('outer', format('login_uaa', {}));
-                replace_content('login-status', '<p class="warning">' + uaa_location + " does not appear to be a running UAA instance or may not have a trusted SSL certificate"  + '</p> <button id="loginWindow" onclick="uaa_login_window()">Single Sign On</button>');
+                replace_content('login-status', '<p class="warning">' + oauth.url + " does not appear to be a running UAA instance or may not have a trusted SSL certificate"  + '</p> <button id="loginWindow" onclick="uaa_login_window()">Single Sign On</button>');
             } else {
                 replace_content('outer', format('login_uaa', {}));
             }
@@ -63,7 +63,7 @@ function start_app_login() {
             check_login();
         });
     });
-    if (enable_uaa) {
+    if (oauth['enable']) {
         var token = getAccessToken();
         if (token != null) {
             set_auth_pref(uaa_client_id + ':' + token);
@@ -94,11 +94,11 @@ function uaa_login_window() {
         redirect = window.location.href
     };
     var loginRedirectUrl;
-    if (uaa_invalid) {
-        loginRedirectUrl = Singular.properties.uaaLocation + '/logout.do?client_id=' + Singular.properties.clientId + '&redirect=' + redirect;
-    } else {
+//mr    if (uaa_invalid) {
+//        loginRedirectUrl = Singular.properties.uaaLocation + '/logout.do?client_id=' + Singular.properties.clientId + '&redirect=' + redirect;
+//    } else {
         loginRedirectUrl = Singular.properties.uaaLocation + '/oauth/authorize?response_type=token&client_id=' + Singular.properties.clientId + '&redirect_uri=' + redirect;
-    };
+//    };
     window.open(loginRedirectUrl, "LOGIN_WINDOW");
 }
 
@@ -109,8 +109,8 @@ function check_login() {
         clear_pref('auth');
         clear_pref('uaa_token');
         clear_cookie_value('auth');
-        if (enable_uaa) {
-            uaa_invalid = true;
+        if (oauth['enable']) {
+            // mr:    uaa_invalid = true;
             replace_content('login-status', '<button id="loginWindow" onclick="uaa_login_window()">Log out</button>');
         } else {
             replace_content('login-status', '<p>Login failed</p>');

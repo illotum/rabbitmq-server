@@ -407,9 +407,13 @@ end}.
 %% Your client application's identifier as registered with the OIDC/OAuth2
 {mapping, "management.oauth_client_id", "rabbitmq_management.oauth_client_id",
       [{datatype, string}]}.
+{mapping, "management.oauth_client_secret", "rabbitmq_management.oauth_client_secret",
+      [{datatype, string}]}.
 
 %% The URL of the OIDC/OAuth2 provider
 {mapping, "management.oauth_url", "rabbitmq_management.oauth_url",
+      [{datatype, string}]}.
+{mapping, "management.oauth_resource_id", "rabbitmq_management.oauth_resource_id",
       [{datatype, string}]}.
 
 

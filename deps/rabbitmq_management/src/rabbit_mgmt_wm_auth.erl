@@ -30,7 +30,9 @@ to_json(ReqData, Context) ->
     Data = case EnableOAUTH of
                true ->
                    OAuthClientId = application:get_env(rabbitmq_management, oauth_client_id, ""),
+                   OAuthClientSecret = application:get_env(rabbitmq_management, oauth_client_secret, ""),
                    OAuthURL = application:get_env(rabbitmq_management, oauth_url, ""),
+                   OAuthResourceId = application:get_env(rabbitmq_management, oauth_resource_id, ""),
                    case is_invalid([OAuthClientId, OAuthURL]) of
                        true ->
                            rabbit_log:warning("Disabling OAuth 2 authorization, relevant configuration settings are missing", []),
@@ -38,10 +40,13 @@ to_json(ReqData, Context) ->
                        false ->
                            [{oauth_enable, true},
                             {oauth_client_id, rabbit_data_coercion:to_binary(OAuthClientId)},
-                            {oauth_url, rabbit_data_coercion:to_binary(OAuthURL)}]
+                            {oauth_client_secret, rabbit_data_coercion:to_binary(OAuthClientSecret)},
+                            {oauth_url, rabbit_data_coercion:to_binary(OAuthURL)},
+                            {oauth_resource_id, rabbit_data_coercion:to_binary(OAuthResourceId)}
+                            ]
                    end;
                false ->
-                   [{enable_oauth, false}, {oauth_client_id, <<>>}, {oauth_url, <<>>}]
+                   [{enable_oauth, false}, {oauth_client_id, <<>>}, {oauth_client_secret, <<>>}, {oauth_url, <<>>}]
            end,
     rabbit_mgmt_util:reply(Data, ReqData, Context).
 
