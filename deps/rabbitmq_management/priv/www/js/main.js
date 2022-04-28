@@ -4,7 +4,7 @@ $(document).ready(function() {
         get(oauth['readiness_url'], "application/json", function(req) {
             if (req.status !== 200) {
                 replace_content('outer', format('login_uaa', {}));
-                replace_content('login-status', '<p class="warning">' + oauth.url + " does not appear to be a running UAA instance or may not have a trusted SSL certificate"  + '</p> <button id="loginWindow" onclick="uaa_login_window()">Single Sign On</button>');
+                replace_content('login-status', '<p class="warning">' + oauth.url + " does not appear to be a running UAA instance or may not have a trusted SSL certificate"  + '</p> <button id="loginWindow" onclick="initiateLogin()">Single Sign On</button>');
             } else {
                 replace_content('outer', format('login_uaa', {}));
             }
@@ -85,24 +85,9 @@ function start_app_login() {
 
 function uaa_logout_window() {
     uaa_invalid = true;
-    uaa_login_window();
+    initiateLogin();
 }
 
-function uaa_login_window() {
-    var redirect;
-    if (window.location.hash != "") {
-        redirect = window.location.href.split(window.location.hash)[0];
-    } else {
-        redirect = window.location.href
-    };
-    var loginRedirectUrl;
-//mr    if (uaa_invalid) {
-//        loginRedirectUrl = Singular.properties.uaaLocation + '/logout.do?client_id=' + Singular.properties.clientId + '&redirect=' + redirect;
-//    } else {
-        loginRedirectUrl = Singular.properties.uaaLocation + '/oauth/authorize?response_type=token&client_id=' + Singular.properties.clientId + '&redirect_uri=' + redirect;
-//    };
-    window.open(loginRedirectUrl, "LOGIN_WINDOW");
-}
 
 function check_login() {
     user = JSON.parse(sync_get('/whoami'));
@@ -113,7 +98,7 @@ function check_login() {
         clear_cookie_value('auth');
         if (oauth.enable) {
             // mr:    uaa_invalid = true;
-            replace_content('login-status', '<button id="loginWindow" onclick="uaa_login_window()">Log out</button>');
+            replace_content('login-status', '<button id="loginWindow" onclick="initiateLogin()">Log out</button>');
         } else {
             replace_content('login-status', '<p>Login failed</p>');
         }

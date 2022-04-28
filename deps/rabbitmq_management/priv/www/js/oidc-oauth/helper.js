@@ -109,10 +109,10 @@ function initiateLogin() {
     });
 }
 function redirectToHome() {
-  location.href = "/index.html"
+  location.href = "/"
 }
 function redirectToLogin() {
-  location.href = "/login.html"
+  location.href = "/"
 }
 function completeLogin() {
     mgr.signinRedirectCallback().then(user => redirectToHome()).catch(function(err) {
