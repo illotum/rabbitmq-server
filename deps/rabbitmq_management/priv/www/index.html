@@ -31,8 +31,10 @@
             replace_content('outer', format('login_uaa', {}));
           }  else {
             oauth.logged_in = true
+            oauth.access_token = status.user.access_token
+            oauth.expires_at = status.user.expires_at
             oauth.user_name = status.user.profile["user_name"]
-            oauth.scopes = status.user.scope          
+            oauth.scopes = status.user.scope
             start_app_login();
           }
         });

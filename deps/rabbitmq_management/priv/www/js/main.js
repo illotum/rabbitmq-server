@@ -1,4 +1,4 @@
-/* MR
+
 $(document).ready(function() {
     if (oauth.enable && !oauth.logged_in && oauth.readiness_url) {
         get(oauth['readiness_url'], "application/json", function(req) {
@@ -14,7 +14,7 @@ $(document).ready(function() {
         start_app_login();
     }
 });
-*/
+
 
 function dispatcher_add(fun) {
     dispatcher_modules.push(fun);
@@ -66,10 +66,10 @@ function start_app_login() {
         });
     });
     if (oauth.enable) {
-        var token = getAccessToken();
+        var token = oauth.access_token; //getAccessToken();
         if (token != null) {
-            //set_auth_pref(uaa_client_id + ':' + token);
-            store_pref('uaa_token', token);
+            set_auth_pref(oauth.client_id + ':' + oauth.access_token);
+            store_pref('uaa_token', oauth.access_token);
             check_login();
         } else if(has_auth_cookie_value()) {
             check_login();
@@ -111,7 +111,7 @@ function check_login() {
         clear_pref('auth');
         clear_pref('uaa_token');
         clear_cookie_value('auth');
-        if (oauth['enable']) {
+        if (oauth.enable) {
             // mr:    uaa_invalid = true;
             replace_content('login-status', '<button id="loginWindow" onclick="uaa_login_window()">Log out</button>');
         } else {
