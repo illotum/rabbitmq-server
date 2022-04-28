@@ -20,6 +20,7 @@ function initializeOAuthIfRequired() {
 
 }
 
+
 function initializeOAuth(authSettings) {
     oauth = {
       "logged_in": false,
@@ -46,6 +47,11 @@ function initializeOAuth(authSettings) {
         filterProtocolClaims: true,
         revokeAccessTokenOnSignout: true,
     };
+    if (authSettings.enable_uaa) {
+      oidcSettings.metadataSeed = {
+        end_session_endpoint: authSettings.oauth_url + '/logout.do'
+      }
+    }
 
     mgr = new oidc.UserManager(oidcSettings);
     oidc.Log.setLogger(console);

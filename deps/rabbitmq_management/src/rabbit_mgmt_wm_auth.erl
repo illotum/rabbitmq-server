@@ -25,7 +25,7 @@ content_types_provided(ReqData, Context) ->
    {rabbit_mgmt_util:responder_map(to_json), ReqData, Context}.
 
 to_json(ReqData, Context) ->
-    %% EnableUAA = application:get_env(rabbitmq_management, enable_uaa, false),
+    EnableUAA = application:get_env(rabbitmq_management, enable_uaa, false),
     EnableOAUTH = application:get_env(rabbitmq_management, oauth_enable, false),
     Data = case EnableOAUTH of
                true ->
@@ -39,6 +39,7 @@ to_json(ReqData, Context) ->
                            [{oauth_enable, false}, {oauth_client_id, <<>>}, {oauth_url, <<>>}];
                        false ->
                            [{oauth_enable, true},
+                            {enable_uaa, rabbit_data_coercion:to_binary(EnableUAA)},
                             {oauth_client_id, rabbit_data_coercion:to_binary(OAuthClientId)},
                             {oauth_client_secret, rabbit_data_coercion:to_binary(OAuthClientSecret)},
                             {oauth_url, rabbit_data_coercion:to_binary(OAuthURL)},

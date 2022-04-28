@@ -23,7 +23,7 @@
       </select>
     </li>
     <li id="logout">
-    <% if (enable_uaa) { %>
+    <% if (oauth.enable) { %>
       <input type="submit" id="loginWindow" onclick="initiateLogout()" value="Log out"/>
     <% } else { %>
       <form action="#/logout" method="put">

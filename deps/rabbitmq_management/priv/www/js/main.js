@@ -104,6 +104,8 @@ function check_login() {
         }
     }
     else {
+        if (oauth.enable) user.name = oauth.user_name;
+        
         hide_popup_warn();
         replace_content('outer', format('layout', {}));
         var user_login_session_timeout = parseInt(user.login_session_timeout);
