@@ -68,7 +68,7 @@ function start_app_login() {
     if (oauth.enable) {
         var token = oauth.access_token; //getAccessToken();
         if (token != null) {
-            set_auth_pref(oauth.client_id + ':' + oauth.access_token);
+            set_auth_pref(oauth.user_name + ':' + oauth.access_token);
             store_pref('uaa_token', oauth.access_token);
             check_login();
         } else if(has_auth_cookie_value()) {
