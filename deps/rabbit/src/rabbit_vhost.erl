@@ -140,6 +140,20 @@ parse_tags(Val) when is_list(Val) ->
         [trim_tag(Tag) || Tag <- re:split(ValUnicode, ",", [unicode, {return, list}])]
     end.
 
+-spec default_limits(vhost:name()) -> proplists:proplist().
+default_limits(Name) ->
+    AllLimits = application:get_env(rabbit, default_limits, []),
+    VHostLimits = proplists:get_value(vhost, AllLimits, []),
+    Match = lists:search(fun({RE, _}) ->
+                                 re:run(Name, RE, [{capture, none}]) =:= match
+                         end, VHostLimits),
+    case Match of
+        {value, {_, Limits}} -> rabbit_log:debug("Found matching default_limits for vhost '~ts': ~tp",
+                                                 [Name, Limits]),
+                                Limits;
+        _                    -> []
+    end.
+
 -spec add(vhost:name(), rabbit_types:username()) ->
     rabbit_types:ok_or_error(any()).
 add(VHost, ActingUser) ->
@@ -192,13 +206,15 @@ do_add(Name, Metadata, ActingUser) ->
             rabbit_log:info("Adding vhost '~ts' (description: '~ts', tags: ~tp)",
                             [Name, Description, Tags])
     end,
+    DefaultLimits = default_limits(Name),
     VHost = rabbit_misc:execute_mnesia_transaction(
           fun () ->
                   case mnesia:wread({rabbit_vhost, Name}) of
                       [] ->
-                        Row = vhost:new(Name, [], Metadata),
+                        Row = vhost:new(Name, DefaultLimits, Metadata),
                         rabbit_log:debug("Inserting a virtual host record ~tp", [Row]),
                         ok = mnesia:write(rabbit_vhost, Row, write),
+                        ok = rabbit_vhost_limit:set(Name, DefaultLimits, ActingUser),
                         Row;
                       %% the vhost already exists
                       [Row] ->
