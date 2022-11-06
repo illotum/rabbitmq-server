@@ -112,9 +112,12 @@
          consumer_utilisation,
          consumer_capacity,
          memory,
-         slave_pids,
-         synchronised_slave_pids,
-         recoverable_slaves,
+         slave_pids,              % Deprecated
+         synchronised_slave_pids, % Deprecated
+         recoverable_slaves,      % Deprecated
+         mirror_pids,
+         synchronised_mirror_pids,
+         recoverable_mirrors,
          state,
          garbage_collection
         ]).
@@ -1156,7 +1159,10 @@ i(consumer_capacity, #q{consumers = Consumers}) ->
 i(memory, _) ->
     {memory, M} = process_info(self(), memory),
     M;
-i(slave_pids, #q{q = Q0}) ->
+i(slave_pids, State) ->
+    %% Deprecated
+    i(mirror_pids, State);
+i(mirror_pids, #q{q = Q0}) ->
     Name = amqqueue:get_name(Q0),
     case rabbit_amqqueue:lookup(Name) of
         {ok, Q} ->
@@ -1167,7 +1173,10 @@ i(slave_pids, #q{q = Q0}) ->
         {error, not_found} ->
             ''
     end;
-i(synchronised_slave_pids, #q{q = Q0}) ->
+i(synchronised_slave_pids, State) ->
+    %% Deprecated
+    i(synchronised_mirror_pids, State);
+i(synchronised_mirror_pids, #q{q = Q0}) ->
     Name = amqqueue:get_name(Q0),
     case rabbit_amqqueue:lookup(Name) of
         {ok, Q} ->
@@ -1178,7 +1187,10 @@ i(synchronised_slave_pids, #q{q = Q0}) ->
         {error, not_found} ->
             ''
     end;
-i(recoverable_slaves, #q{q = Q0}) ->
+i(recoverable_slaves, State) ->
+    %% Deprecated
+    i(recoverable_mirrors, State);
+i(recoverable_mirrors, #q{q = Q0}) ->
     Name = amqqueue:get_name(Q0),
     Durable = amqqueue:is_durable(Q0),
     case rabbit_amqqueue:lookup(Name) of

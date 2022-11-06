@@ -9,7 +9,11 @@ defmodule RabbitMQ.CLI.Ctl.InfoKeys do
   alias RabbitMQ.CLI.Core.DataCoercion
 
   def validate_info_keys(args, valid_keys) do
-    info_keys = prepare_info_keys(args)
+    validate_info_keys(args, valid_keys, %{})
+  end
+
+  def validate_info_keys(args, valid_keys, aliases) do
+    info_keys = prepare_info_keys(args, aliases)
 
     case invalid_info_keys(info_keys, Enum.map(valid_keys, &DataCoercion.to_atom/1)) do
       [_ | _] = bad_info_keys ->
@@ -21,16 +25,25 @@ defmodule RabbitMQ.CLI.Ctl.InfoKeys do
   end
 
   def prepare_info_keys(args) do
+    prepare_info_keys(args, %{})
+  end
+
+  def prepare_info_keys(args, aliases) do
     args
     |> Enum.flat_map(fn arg -> String.split(arg, ",", trim: true) end)
     |> Enum.map(fn s -> String.replace(s, ",", "") end)
     |> Enum.map(&String.trim/1)
     |> Enum.map(&String.to_atom/1)
+    |> Enum.map(fn k -> Map.get(aliases, k, k) end)
     |> Enum.uniq()
   end
 
   def with_valid_info_keys(args, valid_keys, fun) do
-    case validate_info_keys(args, valid_keys) do
+    with_valid_info_keys(args, valid_keys, %{}, fun)
+  end
+
+  def with_valid_info_keys(args, valid_keys, aliases, fun) do
+    case validate_info_keys(args, valid_keys, aliases) do
       {:ok, info_keys} -> fun.(info_keys)
       err -> err
     end
