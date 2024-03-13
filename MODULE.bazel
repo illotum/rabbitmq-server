@@ -145,6 +145,13 @@ erlang_package.hex_package(
 )
 
 erlang_package.hex_package(
+    name = "rate_limiter",
+    build_file = "@rabbitmq-server//bazel:BUILD.rate_limiter",
+    sha256 = "04b8dcc7e2b0e2bd62196df2931e60f0da16c8efd6a737bc07ce75ec16b2e502",
+    version = "0.4.0",
+)
+
+erlang_package.hex_package(
     name = "cuttlefish",
     build_file = "@rabbitmq-server//bazel:BUILD.cuttlefish",
     sha256 = "43cadd7f34b3dbbab52a7f4110d1df276a13cff5e11afe0f5a774f69f012b76b",
@@ -324,6 +331,7 @@ use_repo(
     "cowlib",
     "credentials_obfuscation",
     "csv",
+    "rate_limiter",
     "cuttlefish",
     "eetcd",
     "gen_batch_server",
