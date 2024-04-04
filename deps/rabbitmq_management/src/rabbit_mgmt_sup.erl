@@ -24,6 +24,8 @@ init([]) ->
           permanent, ?SUPERVISOR_WAIT, supervisor, [management_worker_pool_sup]},
     DBC = {rabbit_mgmt_db_cache_sup, {rabbit_mgmt_db_cache_sup, start_link, []},
           permanent, ?SUPERVISOR_WAIT, supervisor, [rabbit_mgmt_db_cache_sup]},
+    DBC = {rabbit_mgmt_db_cache_sup, {rabbit_mgmt_db_cache_sup, start_link, []},
+          permanent, ?SUPERVISOR_WAIT, supervisor, [rabbit_mgmt_db_cache_sup]},
     {ok, {{one_for_one, 100, 1}, [DB, WP, DBC]}}.
 
 start_link() ->
