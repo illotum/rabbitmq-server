@@ -1,11 +1,12 @@
--module(rabbit_mgmt_throttle_h).
+-module(rabbit_throttle_stream_h).
 -behavior(cowboy_stream).
 
--export([init/3]). % With parsed headers.
--export([data/4]). % With parsed (chunked) body.
--export([info/3]). % With system updates.
--export([terminate/3]). % When the request is over.
--export([early_error/5]). % If failed before headers.
+%% cowboy_stream callbacks
+-export([init/3, % With parsed headers.
+         data/4, % With parsed (chunked) body.
+         info/3, % With system updates.
+         terminate/3, % When the request is over.
+         early_error/5]). % If failed before headers.
 
 -define(RL, 'Elixir.RateLimiter').
 -define(RATE, 1).
